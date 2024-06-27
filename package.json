@@ -1,0 +1,40 @@
+{
+  "name": "WylBrowser",
+  "version": "0.0.1",
+  "description": "Düşük Sistemler İçin Tarayıcı",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.wylsoftware.wylbrowser",
+    "productName": "WylBrowser",
+    "files": [
+      "main.js",
+      "index.html",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "linux": {
+      "target": [
+        "deb"
+      ],
+      "category": "Utility"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico"
+    }
+  },
+  "devDependencies": {
+  "electron": "^13.1.4",
+  "electron-builder": "^22.13.1"
+}
+
+}

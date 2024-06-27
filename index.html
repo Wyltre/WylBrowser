@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Browser</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background-color: var(--background-color, #fafafa);
+      color: var(--text-color, #000);
+    }
+
+    #search-container {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background-color: var(--search-bg-color, #ffffff);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    #search-icon {
+      font-size: 24px;
+      margin-right: 10px;
+      color: var(--icon-color, #0078d4);
+    }
+
+    #search-bar {
+      flex: 1;
+      padding: 10px 15px;
+      font-size: 18px;
+      border: 1px solid var(--border-color, #ddd);
+      border-radius: 25px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      outline: none;
+      background-color: var(--input-bg-color, #ffffff);
+      color: var(--text-color, #000);
+      transition: border-color 0.3s ease;
+    }
+
+    #search-bar:focus {
+      border-color: var(--focus-border-color, #0078d4);
+    }
+
+    #web-view {
+      width: 100%;
+      height: calc(100vh - 60px);
+      border: none;
+    }
+
+    #dark-mode-toggle {
+      cursor: pointer;
+      margin-left: 10px;
+      font-size: 24px;
+      color: var(--icon-color, #0078d4);
+    }
+  </style>
+</head>
+<body>
+  <div id="search-container">
+    <span id="search-icon">&#128269;</span>
+    <input type="text" id="search-bar" placeholder="Search...">
+    <span id="dark-mode-toggle">&#9790;</span> <!-- Moon icon for dark mode -->
+  </div>
+
+  <webview id="web-view" src="https://www.google.com"></webview>
+
+  <script>
+    const searchBar = document.getElementById('search-bar');
+    const webView = document.getElementById('web-view');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const { ipcRenderer } = require('electron');
+
+    ipcRenderer.on('load-data', (event, data) => {
+      searchBar.value = data.searchTerm || ''; 
+      webView.src = data.currentUrl || 'https://www.google.com';
+      if (data.isDarkMode) {
+        document.body.classList.add('dark-mode');
+      }
+    });
+
+    searchBar.addEventListener('keyup', (event) => {
+      if (event.key === 'Enter') {
+        const searchTerm = searchBar.value;
+        const encodedSearchTerm = encodeURIComponent(searchTerm); 
+
+        if (searchTerm.trim() !== '') {
+          if (searchTerm.includes('.') || searchTerm.startsWith('http')) {
+            webView.src = searchTerm; 
+          } else {
+            webView.src = `https://www.google.com/search?q=${encodedSearchTerm}`;
+          }
+
+          ipcRenderer.send('save-data', { 
+            searchTerm, 
+            currentUrl: webView.src,
+            isDarkMode: document.body.classList.contains('dark-mode')
+          });
+        }
+      }
+    });
+
+    darkModeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      ipcRenderer.send('save-data', { 
+        searchTerm: searchBar.value, 
+        currentUrl: webView.src,
+        isDarkMode: document.body.classList.contains('dark-mode')
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark-mode');
+      }
+    });
+  </script>
+  <style>
+    .dark-mode {
+      --background-color: #1e1e1e;
+      --text-color: #f5f5f5;
+      --search-bg-color: #333333;
+      --icon-color: #f5f5f5;
+      --border-color: #555555;
+      --input-bg-color: #555555;
+      --focus-border-color: #88b0d3;
+    }
+  </style>
+</body>
+</html>
