@@ -1,6 +1,8 @@
 # WylBrowser
 
-Düşük sistemler için optimize edilmiş bir tarayıcı olan WylBrowser.
+Düşük sistemler için optimize edilmiş bir tarayıcı.
+
+## Şuanlık Kullanılması ÖNERİLMEZ.
 
 ## Kurulum
 
@@ -23,7 +25,8 @@ Uygulamayı yerel olarak çalıştırmak için şu adımları izleyin:
  ```bash
 npm install
 
-3. **Başlatın**
-```bash
- npx electron .
+
+npx electron .
+
+
 
